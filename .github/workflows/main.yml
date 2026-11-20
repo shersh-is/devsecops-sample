@@ -64,15 +64,18 @@ jobs:
         path: scout-report.sarif
 
   dast_scan:
-    name: Deploy PyGoat and run ZAP
+    name: Deploy patched PyGoat and run ZAP
     runs-on: ubuntu-latest
 
     steps:
-      - name: Pull PyGoat
-        run: docker pull pygoat/pygoat:latest
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Start PyGoat
-        run: docker run --rm -d --name pygoat -p 8000:8000 pygoat/pygoat:latest
+      - name: Build patched PyGoat image
+        run: docker build -f Dockerfile -t mytestapp:patched .
+
+      - name: Start patched PyGoat
+        run: docker run --rm -d --name pygoat -p 8000:8000 mytestapp:patched
 
       - name: Wait for PyGoat
         run: |
