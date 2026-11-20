@@ -26,9 +26,15 @@ SECRET_KEY = 'lr66%-a!$km5ed@n5ug!tya5bv!0(yqwa1tn!q%0%3m2nh%oml'
 SENSITIVE_DATA = 'FLAGTHATNEEDSTOBEFOUND'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['pygoat.herokuapp.com', '0.0.0.0.']
+ALLOWED_HOSTS = [
+    "pygoat.herokuapp.com",
+    "0.0.0.0",
+    "127.0.0.1",
+    "localhost",
+    "172.17.0.1",
+]
 
 
 # Application definition
