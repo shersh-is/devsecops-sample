@@ -75,7 +75,7 @@ jobs:
         run: docker build -f Dockerfile -t mytestapp:patched .
 
       - name: Start patched PyGoat
-        run: docker run --rm -d --name pygoat -p 8000:8000 mytestapp:patched
+        run: docker run -d --name pygoat -p 8000:8000 mytestapp:patched
 
       - name: Wait for PyGoat
         run: |
