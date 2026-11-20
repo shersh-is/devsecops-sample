@@ -62,3 +62,43 @@ jobs:
       with:
         name: docker-scout-findings
         path: scout-report.sarif
+
+  dast_scan:
+    name: Deploy PyGoat and run ZAP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull PyGoat
+        run: docker pull pygoat/pygoat:latest
+
+      - name: Start PyGoat
+        run: docker run --rm -d --name pygoat -p 8000:8000 pygoat/pygoat:latest
+
+      - name: Wait for PyGoat
+        run: |
+          for i in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:8000/ >/dev/null; then
+              echo "PyGoat is ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs pygoat
+          exit 1
+
+      - name: Set target address for ZAP
+        run: |
+          TARGET_IP=$(ip -f inet -o addr show docker0 | awk '{print $4}' | cut -d '/' -f 1)
+          echo "ZAP_TARGET=http://${TARGET_IP}:8000" >> "$GITHUB_ENV"
+
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.15.0
+        with:
+          target: ${{ env.ZAP_TARGET }}
+          allow_issue_writing: false
+          fail_action: false
+          artifact_name: zap_scan
+
+      - name: Stop PyGoat
+        if: always()
+        run: docker rm -f pygoat || true
